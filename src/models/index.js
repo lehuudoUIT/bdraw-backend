@@ -17,6 +17,11 @@ const customizeConfig = {
   port: process.env.DB_PORT,
   dialect: process.env.DB_DIALECT,
   logging: false,
+  dialectOptions: {
+    dateStrings: true,
+  },
+
+  timezone: "+07:00", // for writing to database
 };
 
 sequelize = new Sequelize(

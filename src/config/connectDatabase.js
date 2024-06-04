@@ -9,6 +9,17 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT,
     port: process.env.DB_PORT,
+    dialectOptions: {
+      dateStrings: true,
+      // typeCast: function (field, next) {
+      //   // for reading from database
+      //   if (field.type === "DATETIME") {
+      //     return field.string();
+      //   }
+      //   return next();
+      // },
+    },
+    timezone: "+07:00",
   }
 );
 

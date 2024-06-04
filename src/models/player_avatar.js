@@ -1,5 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
+import moment from "moment-timezone";
+
 module.exports = (sequelize, DataTypes) => {
   class Player_Avatar extends Model {
     /**
@@ -20,7 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       playerId: DataTypes.INTEGER,
       avatarId: DataTypes.INTEGER,
-      createdAt: new Date(),
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
     },
     {
       sequelize,

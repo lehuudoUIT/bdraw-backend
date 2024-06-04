@@ -1,5 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
+import moment from "moment-timezone";
+
 module.exports = (sequelize, DataTypes) => {
   class Rank extends Model {
     /**
@@ -20,8 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       scoreMilestone: DataTypes.INTEGER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
     },
     {
       sequelize,

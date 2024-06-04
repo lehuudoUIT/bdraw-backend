@@ -1,5 +1,11 @@
 "use strict";
 const { Model } = require("sequelize");
+import moment from "moment-timezone";
+
+console.log(
+  moment.tz(new Date(), "Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss")
+);
+
 module.exports = (sequelize, DataTypes) => {
   class Player extends Model {
     /**
@@ -26,8 +32,16 @@ module.exports = (sequelize, DataTypes) => {
       exp: DataTypes.INTEGER,
       score: DataTypes.INTEGER,
       gmail: DataTypes.STRING,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
     },
     {
       sequelize,

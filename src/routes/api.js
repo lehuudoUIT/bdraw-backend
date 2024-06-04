@@ -19,6 +19,9 @@ let initApiRoutes = (app) => {
   router.get("/item/detail/:id", getDetailItem);
   router.get("/items", getAllItems);
   //! MATCH
+  router.get("/match/detail/:id");
+  router.post("/match/create");
+  router.post("/match/result");
 
   return app.use("/api/v1/", router);
 };

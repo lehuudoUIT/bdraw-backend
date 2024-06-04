@@ -1,5 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
+import moment from "moment-timezone";
+
 module.exports = (sequelize, DataTypes) => {
   class Match extends Model {
     /**
@@ -18,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      createdAt: new Date(),
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: () =>
+          moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
+      },
     },
     {
       sequelize,
