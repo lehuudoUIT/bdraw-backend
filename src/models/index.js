@@ -17,10 +17,22 @@ const customizeConfig = {
   port: process.env.DB_PORT,
   dialect: process.env.DB_DIALECT,
   logging: false,
-  dialectOptions: {
-    dateStrings: true,
+  define: {
+    timestamps: false,
   },
-
+  dialectOptions:
+    // dateStrings: true,
+    process.env.DD_SSL === "true"
+      ? {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        }
+      : {},
+  query: {
+    raw: true,
+  },
   timezone: "+07:00", // for writing to database
 };
 
@@ -56,6 +68,9 @@ fs.readdirSync(__dirname)
       sequelize,
       Sequelize.DataTypes
     );
+    // console.log("🚀 ~ .forEach ~ model:", model);
+    // console.log("🚀 ~ .forEach ~ model.name:", model.name);
+
     db[model.name] = model;
   });
 

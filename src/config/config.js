@@ -8,9 +8,18 @@ module.exports = {
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT,
     port: process.env.DB_PORT,
-    dialectOptions: {
-      dateStrings: true,
+    define: {
+      timestamps: false,
     },
+    dialectOptions:
+      process.env.DD_SSL === "true"
+        ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false,
+            },
+          }
+        : {},
     timezone: "+07:00", // for writing to database
   },
   test: {

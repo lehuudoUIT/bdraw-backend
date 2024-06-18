@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: () =>
           moment.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD HH:mm:ss"),
       },
+      status: DataTypes.BOOLEAN,
     },
     {
       sequelize,

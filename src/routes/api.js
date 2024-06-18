@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { handleLogin, handleRegister } from "../controllers/playerController";
-import { getDetailItem, getAllItems } from "../controllers/itemController";
+import {
+  getDetailItem,
+  getAllItems,
+  logAllDb,
+} from "../controllers/itemController";
 let router = Router();
 
 let initApiRoutes = (app) => {
@@ -22,6 +26,9 @@ let initApiRoutes = (app) => {
   router.get("/match/detail/:id");
   router.post("/match/create");
   router.post("/match/result");
+
+  //! DEBUG
+  router.get("/log-all", logAllDb);
 
   return app.use("/api/v1/", router);
 };

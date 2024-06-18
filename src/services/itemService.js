@@ -1,5 +1,34 @@
 import db from "../models/index";
 
+const logAll = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let avatars = await db.Avatar.findAll();
+      console.log("🚀 ~ logAll ~ avatars:", avatars);
+      let joins = await db.Join.findAll();
+      console.log("🚀 ~ logAll ~ joins:", joins);
+      let matches = await db.Match.findAll();
+      console.log("🚀 ~ logAll ~ matches:", matches);
+      let player_avatars = await db.Player_Avatar.findAll();
+      console.log("🚀 ~ logAll ~ player_avatars:", player_avatars);
+      let players = await db.Player.findAll();
+      console.log("🚀 ~ logAll ~ players:", players);
+      let ranks = await db.Rank.findAll();
+      console.log("🚀 ~ logAll ~ ranks:", ranks);
+
+      let tables = [avatars, joins, matches, player_avatars, players, ranks];
+
+      return resolve({
+        errCode: 0,
+        message: "Log table successfully!",
+        tables: tables,
+      });
+    } catch (error) {
+      console.log("🚀 ~ logAll ~ error:", error);
+    }
+  });
+};
+
 const detailItem = async (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -49,4 +78,5 @@ const listItem = async () => {
 module.exports = {
   detailItem,
   listItem,
+  logAll,
 };

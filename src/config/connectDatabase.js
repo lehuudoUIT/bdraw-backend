@@ -9,15 +9,21 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT,
     port: process.env.DB_PORT,
-    dialectOptions: {
-      dateStrings: true,
-      // typeCast: function (field, next) {
-      //   // for reading from database
-      //   if (field.type === "DATETIME") {
-      //     return field.string();
-      //   }
-      //   return next();
-      // },
+    define: {
+      timestamps: false,
+    },
+    dialectOptions:
+      // dateStrings: true,
+      process.env.DD_SSL === "true"
+        ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false,
+            },
+          }
+        : {},
+    query: {
+      raw: true,
     },
     timezone: "+07:00",
   }
