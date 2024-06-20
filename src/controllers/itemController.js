@@ -18,12 +18,14 @@ const getAllItems = async (req, res) => {
   return res.status(200).json(response);
 };
 
-const testFunction = () => {
+const testFunction = (req, res) => {
   console.log("Test function");
+  return res.status(200).json(["Test function"]);
 };
 
 module.exports = {
   getDetailItem,
   getAllItems,
   logAllDb,
+  testFunction,
 };

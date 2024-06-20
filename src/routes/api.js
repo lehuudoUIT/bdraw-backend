@@ -4,6 +4,7 @@ import {
   getDetailItem,
   getAllItems,
   logAllDb,
+  testFunction,
 } from "../controllers/itemController";
 let router = Router();
 
@@ -29,6 +30,7 @@ let initApiRoutes = (app) => {
 
   //! DEBUG
   router.get("/log-all", logAllDb);
+  router.get("/log-test", testFunction);
 
   return app.use("/api/v1/", router);
 };
