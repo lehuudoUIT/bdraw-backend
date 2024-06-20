@@ -20,7 +20,7 @@ const getAllItems = async (req, res) => {
 
 const testFunction = (req, res) => {
   console.log("Test function");
-  return res.status(200).json(["Test function"]);
+  return res.status(200).json(["Test function neeeeee 123aaaa"]);
 };
 
 module.exports = {
