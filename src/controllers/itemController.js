@@ -18,6 +18,10 @@ const getAllItems = async (req, res) => {
   return res.status(200).json(response);
 };
 
+const testFunction = () => {
+  console.log("Test function");
+};
+
 module.exports = {
   getDetailItem,
   getAllItems,
