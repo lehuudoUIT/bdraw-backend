@@ -107,7 +107,146 @@ const handlePlayerRegister = (username, password, gmail) => {
   });
 };
 
+const playerHistory = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let history = await db.Join.findAll({
+        where: {
+          playerId: id,
+        },
+      }).catch((err) => {
+        console.log(err);
+      });
+      return resolve({
+        errCode: 0,
+        message: `Get player ${id} history successfully!`,
+        history: history,
+      });
+    } catch (error) {
+      reject({
+        errCode: 3,
+        message: `Get player ${id} history unsuccessfully!`,
+        error: error,
+      });
+    }
+  });
+};
+
+const playerDetail = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let player = await db.Player.findOne({
+        where: {
+          playerId: id,
+        },
+      }).catch((err) => {
+        console.log(err);
+      });
+
+      return resolve({
+        errCode: 0,
+        message: `Get player ${id} detail successfully!`,
+        player,
+      });
+    } catch (error) {
+      reject({
+        errCode: 3,
+        message: `Get player ${id} detail unsuccessfully!`,
+        error: error,
+      });
+    }
+  });
+};
+const playerInventory = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      //? Get list avatar id
+      let avatarIds = await db.Player_Avatar.findAll({
+        where: {
+          playerId: id,
+        },
+      })
+        .then((avatars) => {
+          return avatars.map((avatar) => avatar.avatarId);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      //? Get detail avatar
+      let listAvatar = [];
+
+      for (let avatarId of avatarIds) {
+        let avatar = await db.Avatar.findOne({
+          where: {
+            avatarId: avatarId,
+          },
+        });
+
+        listAvatar = listAvatar.concat(avatar);
+      }
+
+      return resolve({
+        errCode: 0,
+        message: `Get player ${id} inventory successfully!`,
+        listAvatar,
+      });
+    } catch (error) {
+      reject({
+        errCode: 3,
+        message: `Get player ${id} inventory unsuccessfully!`,
+        error: error,
+      });
+    }
+  });
+};
+const playerUseItem = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+    } catch (error) {}
+  });
+};
+const playerBuyItem = (playerId, itemId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      db.Player_Avatar.create({
+        playerId,
+        avatarId: itemId,
+      }).catch((err) => {
+        console.log(err);
+        return resolve({
+          errCode: 2,
+          message: `Player ${playerId} buys avatar ${itemId} unsuccessfully!`,
+          error: err,
+        });
+      });
+
+      return resolve({
+        errCode: 0,
+        message: `Player ${playerId} buys avatar ${itemId} successfully!`,
+      });
+    } catch (error) {
+      return resolve({
+        errCode: 3,
+        message: `Player ${playerId} buys avatar ${itemId} unsuccessfully!`,
+        error: error,
+      });
+    }
+  });
+};
+const playerSaveResult = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+    } catch (error) {}
+  });
+};
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
+  playerHistory,
+  playerSaveResult,
+  playerDetail,
+  playerInventory,
+  playerUseItem,
+  playerBuyItem,
 };

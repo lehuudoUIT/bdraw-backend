@@ -1,5 +1,14 @@
 import { Router } from "express";
-import { handleLogin, handleRegister } from "../controllers/playerController";
+import {
+  handleLogin,
+  handleRegister,
+  getPlayerHistory,
+  postPlayerSaveResult,
+  getPlayerDetail,
+  getPlayerInventory,
+  postPlayerUseItem,
+  postPlayerBuyItem,
+} from "../controllers/playerController";
 import {
   getDetailItem,
   getAllItems,
@@ -13,12 +22,12 @@ let initApiRoutes = (app) => {
   router.post("/login", handleLogin);
   router.post("/register", handleRegister);
   //! PLAYER
-  router.get("/player/history/:id");
-  router.get("/match/detail/:id");
-  router.get("/player/detail/:id");
-  router.get("/player/inventory");
-  router.post("/player/use-item");
-  router.post("/player/buy-item");
+  router.get("/player/history/:id", getPlayerHistory);
+  router.get("/player/detail/:id", getPlayerDetail);
+  router.get("/player/inventory/:id", getPlayerInventory);
+  router.post("/player/use-item", postPlayerUseItem);
+  router.post("/player/buy-item", postPlayerBuyItem);
+  router.post("/player/save-result", postPlayerSaveResult);
 
   //! ITEM
   router.get("/item/detail/:id", getDetailItem);

@@ -1,7 +1,7 @@
 {
-  "name": "rainy-words-adventure-be",
+  "name": "bdraw-be",
   "version": "1.0.0",
-  "description": "rainy-words-adventure-be",
+  "description": "bdraw-be",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bht-cnpm-uit/rainy-words-adventure-be.git"
+    "url": "https://github.com/lehuudoUIT/bdraw-backend.git"
   },
   "author": "bhtcnpm",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bht-cnpm-uit/rainy-words-adventure-be/issues"
+    "url": "https://github.com/lehuudoUIT/bdraw-backend.git"
   },
-  "homepage": "https://github.com/bht-cnpm-uit/rainy-words-adventure-be#readme",
+  "homepage": "https://github.com/lehuudoUIT/bdraw-backend.git#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
