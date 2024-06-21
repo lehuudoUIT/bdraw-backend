@@ -9,7 +9,7 @@ const queue = [];
 const initSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: ["https://admin.socket.io", "*"],
       credentials: true,
       methods: ["GET", "POST"],
     },
