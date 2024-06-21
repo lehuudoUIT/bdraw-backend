@@ -200,10 +200,55 @@ const playerInventory = (id) => {
     }
   });
 };
-const playerUseItem = () => {
+const playerUseItem = (playerId, itemId) => {
   return new Promise(async (resolve, reject) => {
     try {
-    } catch (error) {}
+      let player = await db.Player.findOne({
+        where: {
+          playerId: playerId,
+        },
+      }).catch((err) => {
+        console.log(err);
+      });
+
+      let avatarUrl = await db.Avatar.findOne({
+        where: {
+          avatarId: itemId,
+        },
+      })
+        .then((avatar) => {
+          return avatar.url;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      await player
+        .update(
+          {
+            url: avatarUrl,
+          },
+          {
+            where: {
+              playerId: playerId,
+            },
+          }
+        )
+        .catch((err) => {
+          console.log(err);
+        });
+
+      return resolve({
+        errCode: 0,
+        message: `Use avatar ${itemId} successfully!`,
+        listAvatar,
+      });
+    } catch (error) {
+      return reject({
+        errCode: 0,
+        message: `Use avatar unsuccessfully!`,
+      });
+    }
   });
 };
 const playerBuyItem = (playerId, itemId) => {
