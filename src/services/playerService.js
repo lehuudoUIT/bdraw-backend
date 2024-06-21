@@ -223,27 +223,25 @@ const playerUseItem = (playerId, itemId) => {
           console.log(err);
         });
 
-      await player
-        .update(
-          {
-            url: avatarUrl,
+      await db.Player.update(
+        {
+          currentAvatar: avatarUrl,
+        },
+        {
+          where: {
+            playerId: playerId,
           },
-          {
-            where: {
-              playerId: playerId,
-            },
-          }
-        )
-        .catch((err) => {
-          console.log(err);
-        });
+        }
+      ).catch((err) => {
+        console.log(err);
+      });
 
       return resolve({
         errCode: 0,
         message: `Use avatar ${itemId} successfully!`,
-        listAvatar,
       });
     } catch (error) {
+      console.log(error);
       return reject({
         errCode: 0,
         message: `Use avatar unsuccessfully!`,
