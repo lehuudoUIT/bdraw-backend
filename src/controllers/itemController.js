@@ -14,7 +14,7 @@ const getDetailItem = async (req, res) => {
 const getAllItems = async (req, res) => {
   const { id } = req.params;
 
-  let response = await listItem();
+  let response = await listItem(id);
   return res.status(200).json(response);
 };
 

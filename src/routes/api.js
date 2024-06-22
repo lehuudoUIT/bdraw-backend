@@ -32,7 +32,7 @@ let initApiRoutes = (app) => {
   router.get("/match/detail/:id", getMatchDetail);
 
   //! ITEM
-  router.get("/item/get-all", getAllItems);
+  router.get("/item/get-all/:id", getAllItems);
   router.get("/item/detail/:id", getDetailItem);
 
   //! DEBUG
