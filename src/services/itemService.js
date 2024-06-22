@@ -7,8 +7,7 @@ const logAll = async () => {
       console.log("🚀 ~ logAll ~ avatars:", avatars);
       let joins = await db.Join.findAll();
       console.log("🚀 ~ logAll ~ joins:", joins);
-      let matches = await db.Match.findAll();
-      console.log("🚀 ~ logAll ~ matches:", matches);
+
       let player_avatars = await db.Player_Avatar.findAll();
       console.log("🚀 ~ logAll ~ player_avatars:", player_avatars);
       let players = await db.Player.findAll();

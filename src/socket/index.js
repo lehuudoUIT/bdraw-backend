@@ -170,7 +170,7 @@ const initSocket = (server) => {
         }, 27000);
     }
 
-    const handleSetScore = (socket, room, score, round) => {
+    const handleSetScore = async (socket, room, score, round) => {
         console.log("🚀 ~ handleSetScore ~ room:", room)
         const requiredRoom = rooms.find(lroom => lroom.id === room);
 
@@ -193,7 +193,9 @@ const initSocket = (server) => {
                 const indexOfRoom = rooms.indexOf(requiredRoom);
 
                 // Call API
-
+                const response = await fetch("http://localhost:3107/api/v1/log-test");
+                const movies = await response.json();
+                console.log(movies);
 
                 if (indexOfRoom !== -1) {
                     requiredRoom.sockets.forEach(socket => {
