@@ -15,7 +15,7 @@ const logAll = async () => {
       let ranks = await db.Rank.findAll();
       console.log("🚀 ~ logAll ~ ranks:", ranks);
 
-      let tables = [avatars, joins, matches, player_avatars, players, ranks];
+      let tables = [avatars, joins, player_avatars, players, ranks];
 
       return resolve({
         errCode: 0,
