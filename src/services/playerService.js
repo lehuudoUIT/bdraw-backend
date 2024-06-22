@@ -115,6 +115,7 @@ const playerHistory = (id) => {
         where: {
           playerId: id,
         },
+        order: [["createdAt", "DESC"]],
       }).catch((err) => {
         console.log(err);
       });
@@ -320,6 +321,33 @@ const playerSaveResult = (listPlayer) => {
     }
   });
 };
+
+const matchDetail = (matchId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let matchResult = await db.Join.findAll({
+        where: {
+          matchId: matchId,
+        },
+        order: [["top", "ASC"]],
+      });
+
+      return resolve({
+        errCode: 0,
+        message: `Get match ${matchId} result successfully !`,
+        matchResult: matchResult,
+      });
+    } catch {
+      console.log(error);
+      return resolve({
+        errCode: 2,
+        message: `Save player result unsuccessfully !`,
+        error: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -329,4 +357,5 @@ module.exports = {
   playerInventory,
   playerUseItem,
   playerBuyItem,
+  matchDetail,
 };
