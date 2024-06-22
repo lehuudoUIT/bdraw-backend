@@ -12,10 +12,7 @@ const initSocket = (server) => {
         cors: {
             origin: [
                 "https://admin.socket.io",
-                "http://10.0.2.2:3000",
-                "http://localhost:3000",
-                "http://localhost:8081",
-                "http://10.0.2.2:8081",
+                "*"
             ],
             credentials: true,
             methods: ["GET", "POST"],
@@ -38,7 +35,8 @@ const initSocket = (server) => {
                 const newSocket = {
                     id: socket.id,
                     isReady: false,
-                    score: 0
+                    score: 0,
+                    isAFK: false
                 }
                 requiredRoom.sockets.push(newSocket);
                 socket.join(room);
@@ -60,7 +58,8 @@ const initSocket = (server) => {
                 {
                     id: socket.id,
                     isReady: false,
-                    score: 0
+                    score: 0,
+                    isAFK: false
                 }
             ],
             password,
@@ -190,7 +189,10 @@ const initSocket = (server) => {
 
             if (requiredRoom.rounds[5] === true) {
                 // Done 6 rounds
+
                 const indexOfRoom = rooms.indexOf(requiredRoom);
+
+                // Call API
 
                 if (indexOfRoom !== -1) {
                     requiredRoom.sockets.forEach(socket => {
@@ -216,8 +218,8 @@ const initSocket = (server) => {
             const room = {
                 id: `${player1.id}-${player2.id}`,
                 sockets: [
-                    { id: player1.id, isReady: false, score: 0 },
-                    { id: player2.id, isReady: false, score: 0 }
+                    { id: player1.id, isReady: false, score: 0, isAFK: false },
+                    { id: player2.id, isReady: false, score: 0, isAFK: false }
                 ],
                 gameState: false,
                 rounds: new Array(6).fill(false),
@@ -281,6 +283,32 @@ const initSocket = (server) => {
         }
     };
 
+    const handleQuitGame = (socket, roomId) => {
+        const requiredRoom = rooms.find(lroom => lroom.id === roomId);
+        if (requiredRoom) {
+            const player = requiredRoom.sockets.find(p => p.id === socket.id);
+            if (player) {
+                player.isAFK = true;
+                player.score = 0;
+            }
+            io.sockets.sockets.get(player.id)?.leave(requiredRoom.id);
+            io.to(requiredRoom.id).emit('notice-quit', 'Another player has quit the game');
+            console.log(`Player ${socket.id} has quit the game in room ${roomId}`);
+
+            const allLeave = requiredRoom.sockets.every(s => s.isAFK);
+
+            if (allLeave) {
+                // Call API
+
+                //Delete room
+                const indexRoom = rooms.findIndex(room => room.id === requiredRoom.id);
+                if (indexRoom !== -1) {
+                    rooms.splice(indexRoom, 1);
+                }
+            }
+        }
+    };
+
     io.on('connection', (socket) => {
         console.log(`🌞: ${socket.id} user just connected!`);
 
@@ -323,9 +351,11 @@ const initSocket = (server) => {
 
         socket.on('declineMatch', (roomId) => handleDecline(socket, roomId));
 
+        socket.on('quitGame', (roomId) => handleQuitGame(socket, roomId));
+
         socket.on('disconnect', () => {
             handleCancelFindMatch(socket);
-            socket.disconnect()
+            socket.disconnect();
             console.log(`🔥: ${socket.id} disconnected`);
         });
 
