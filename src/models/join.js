@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       playerId: DataTypes.INTEGER,
-      matchId: DataTypes.INTEGER,
+      matchId: DataTypes.STRING,
       gainedBcoin: DataTypes.INTEGER,
       gainedExp: DataTypes.INTEGER,
       gainedScore: DataTypes.INTEGER,

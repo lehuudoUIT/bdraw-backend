@@ -1,5 +1,6 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 
 let salt = bcrypt.genSaltSync(10);
 
@@ -277,10 +278,46 @@ const playerBuyItem = (playerId, itemId) => {
     }
   });
 };
-const playerSaveResult = () => {
+const playerSaveResult = (listPlayer) => {
   return new Promise(async (resolve, reject) => {
     try {
-    } catch (error) {}
+      await db.sequelize.transaction(async (t) => {
+        let matchId = uuidv4();
+        listPlayer.map((player) => {
+          player.matchId = matchId;
+        });
+
+        // update
+        for (const player of listPlayer) {
+          // Update player's result
+
+          await db.Player.increment(
+            {
+              // Assuming you want to update these fields
+              bcoin: player.gainedBcoin,
+              exp: player.gainedExp,
+              score: player.gainedScore,
+            },
+            {
+              where: { playerId: player.playerId },
+            }
+          );
+        }
+        // save record
+        await db.Join.bulkCreate(listPlayer);
+      });
+      return resolve({
+        errCode: 0,
+        message: `Save player result successfully !`,
+      });
+    } catch (error) {
+      console.log(error);
+      return resolve({
+        errCode: 2,
+        message: `Save player result unsuccessfully !`,
+        error: error,
+      });
+    }
   });
 };
 module.exports = {
