@@ -26,6 +26,9 @@ module.exports = {
       top: {
         type: Sequelize.INTEGER,
       },
+      isAFK: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

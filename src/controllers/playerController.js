@@ -92,7 +92,17 @@ const postPlayerBuyItem = async (req, res) => {
   let response = await playerBuyItem(playerId, itemId);
   return res.status(200).json(response);
 };
-const postPlayerSaveResult = async (req, res) => {};
+const postPlayerSaveResult = async (req, res) => {
+  const { listPlayer } = req.body;
+  if (!listPlayer) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing input parameter !",
+    });
+  }
+  let response = await playerSaveResult(listPlayer);
+  return res.status(200).json(response);
+};
 
 module.exports = {
   handleLogin,

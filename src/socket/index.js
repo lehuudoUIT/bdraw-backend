@@ -1,6 +1,6 @@
-const { Server } = require('socket.io');
+const { Server } = require("socket.io");
 const { instrument } = require("@socket.io/admin-ui");
-const data = require('../data/label.json');
+const data = require("../data/label.json");
 
 const rooms = [];
 const countdownTimers = [];
@@ -193,6 +193,7 @@ const initSocket = (server) => {
                 const indexOfRoom = rooms.indexOf(requiredRoom);
 
                 // Call API
+
 
                 if (indexOfRoom !== -1) {
                     requiredRoom.sockets.forEach(socket => {

@@ -30,8 +30,8 @@ let initApiRoutes = (app) => {
   router.post("/player/save-result", postPlayerSaveResult);
 
   //! ITEM
+  router.get("/item/get-all", getAllItems);
   router.get("/item/detail/:id", getDetailItem);
-  router.get("/items", getAllItems);
   //! MATCH
   router.get("/match/detail/:id");
   router.post("/match/create");
