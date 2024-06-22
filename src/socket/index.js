@@ -193,7 +193,7 @@ const initSocket = (server) => {
                 const indexOfRoom = rooms.indexOf(requiredRoom);
 
                 // Call API
-                const response = await fetch("http://localhost:3107/api/v1/log-test");
+                const response = await fetch("http://188.166.185.29:3107/api/v1/log-test");
                 const movies = await response.json();
                 console.log(movies);
 
