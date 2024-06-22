@@ -65,12 +65,13 @@ let handleUserLogin = (username, password) => {
   });
 };
 
-const handlePlayerRegister = (username, password, gmail) => {
+const handlePlayerRegister = (name, username, password, gmail) => {
   return new Promise(async (resolve, reject) => {
     try {
       let hashPassword = bcrypt.hashSync(password, salt);
 
       let player = await db.Player.create({
+        name: name,
         username: username,
         password: hashPassword,
         bcoin: 0,
@@ -254,7 +255,15 @@ const playerUseItem = (playerId, itemId) => {
 const playerBuyItem = (playerId, itemId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      db.Player_Avatar.create({
+      let playerBcoin = await db
+        .findOne({
+          where: {
+            playerId: playerId,
+          },
+        })
+        .then((player) => player.bcoin);
+
+      await db.Player_Avatar.create({
         playerId,
         avatarId: itemId,
       }).catch((err) => {

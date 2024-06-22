@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      name: DataTypes.STRING,
       username: DataTypes.STRING,
       password: DataTypes.STRING,
       bcoin: DataTypes.INTEGER,
