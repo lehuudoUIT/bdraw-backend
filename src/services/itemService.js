@@ -53,11 +53,30 @@ const detailItem = async (id) => {
     }
   });
 };
-const listItem = async () => {
+const listItem = async (id) => {
   return new Promise(async (resolve, reject) => {
     try {
+      //? Get full items of shop
+
       let listItem = await db.Avatar.findAll({ raw: true }).catch((err) => {
         console.log(err);
+      });
+
+      //? Get item player owns
+
+      let listBoughtAvatar = await db.Player_Avatar.findAll({
+        where: {
+          playerId: id,
+        },
+      }).then((avatars) => {
+        return avatars.map((avatar) => avatar.avatarId);
+      });
+
+      //? Check if player owns item then isBought is true, otherwise isBought is false
+
+      listItem.map((item) => {
+        if (listBoughtAvatar.includes(item.avatarId)) item.isBought = true;
+        else item.isBought = false;
       });
 
       return resolve({

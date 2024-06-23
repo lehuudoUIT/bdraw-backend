@@ -7,6 +7,7 @@ import {
   playerInventory,
   playerUseItem,
   playerBuyItem,
+  matchDetail,
 } from "../services/playerService";
 
 let handleLogin = async (req, res) => {
@@ -22,14 +23,14 @@ let handleLogin = async (req, res) => {
 };
 
 const handleRegister = async (req, res) => {
-  const { username, password, gmail } = req.body;
-  if (!username || !password || !gmail) {
+  const { name, username, password, gmail } = req.body;
+  if (!name || !username || !password || !gmail) {
     return res.status(500).json({
       errCode: 1,
       message: "Missing input parameter !",
     });
   }
-  let response = await handlePlayerRegister(username, password, gmail);
+  let response = await handlePlayerRegister(name, username, password, gmail);
   return res.status(200).json(response);
 };
 
@@ -104,6 +105,18 @@ const postPlayerSaveResult = async (req, res) => {
   return res.status(200).json(response);
 };
 
+const getMatchDetail = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing input parameter !",
+    });
+  }
+  let response = await matchDetail(id);
+  return res.status(200).json(response);
+};
+
 module.exports = {
   handleLogin,
   handleRegister,
@@ -113,4 +126,5 @@ module.exports = {
   getPlayerInventory,
   postPlayerUseItem,
   postPlayerBuyItem,
+  getMatchDetail,
 };

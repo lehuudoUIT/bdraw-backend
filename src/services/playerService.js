@@ -65,12 +65,13 @@ let handleUserLogin = (username, password) => {
   });
 };
 
-const handlePlayerRegister = (username, password, gmail) => {
+const handlePlayerRegister = (name, username, password, gmail) => {
   return new Promise(async (resolve, reject) => {
     try {
       let hashPassword = bcrypt.hashSync(password, salt);
 
       let player = await db.Player.create({
+        name: name,
         username: username,
         password: hashPassword,
         bcoin: 0,
@@ -115,6 +116,7 @@ const playerHistory = (id) => {
         where: {
           playerId: id,
         },
+        order: [["createdAt", "DESC"]],
       }).catch((err) => {
         console.log(err);
       });
@@ -253,7 +255,15 @@ const playerUseItem = (playerId, itemId) => {
 const playerBuyItem = (playerId, itemId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      db.Player_Avatar.create({
+      let playerBcoin = await db
+        .findOne({
+          where: {
+            playerId: playerId,
+          },
+        })
+        .then((player) => player.bcoin);
+
+      await db.Player_Avatar.create({
         playerId,
         avatarId: itemId,
       }).catch((err) => {
@@ -320,6 +330,33 @@ const playerSaveResult = (listPlayer) => {
     }
   });
 };
+
+const matchDetail = (matchId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let matchResult = await db.Join.findAll({
+        where: {
+          matchId: matchId,
+        },
+        order: [["top", "ASC"]],
+      });
+
+      return resolve({
+        errCode: 0,
+        message: `Get match ${matchId} result successfully !`,
+        matchResult: matchResult,
+      });
+    } catch {
+      console.log(error);
+      return resolve({
+        errCode: 2,
+        message: `Save player result unsuccessfully !`,
+        error: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -329,4 +366,5 @@ module.exports = {
   playerInventory,
   playerUseItem,
   playerBuyItem,
+  matchDetail,
 };

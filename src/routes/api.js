@@ -8,6 +8,7 @@ import {
   getPlayerInventory,
   postPlayerUseItem,
   postPlayerBuyItem,
+  getMatchDetail,
 } from "../controllers/playerController";
 import {
   getDetailItem,
@@ -28,14 +29,11 @@ let initApiRoutes = (app) => {
   router.post("/player/use-item", postPlayerUseItem);
   router.post("/player/buy-item", postPlayerBuyItem);
   router.post("/player/save-result", postPlayerSaveResult);
+  router.get("/match/detail/:id", getMatchDetail);
 
   //! ITEM
-  router.get("/item/get-all", getAllItems);
+  router.get("/item/get-all/:id", getAllItems);
   router.get("/item/detail/:id", getDetailItem);
-  //! MATCH
-  router.get("/match/detail/:id");
-  router.post("/match/create");
-  router.post("/match/result");
 
   //! DEBUG
   router.get("/log-all", logAllDb);
