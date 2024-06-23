@@ -74,7 +74,7 @@ const handlePlayerRegister = (name, username, password, gmail) => {
         name: name,
         username: username,
         password: hashPassword,
-        bcoin: 0,
+        bcoin: 1000,
         rankId: 0,
         currentAvatar: "",
         exp: 0,
@@ -142,9 +142,29 @@ const playerDetail = (id) => {
         where: {
           playerId: id,
         },
-      }).catch((err) => {
-        console.log(err);
-      });
+      })
+        .then(async (player) => {
+          //? Get url of rank by rankId
+          let url = await db.Rank.findOne({
+            where: {
+              rankId: player.rankId,
+            },
+          }).then((rank) => {
+            console.log(rank);
+            return rank.url;
+          });
+
+          //? Delete field rankId and add rankUrl
+
+          delete player.rankId;
+
+          player.rankUrl = url;
+
+          return player;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       return resolve({
         errCode: 0,

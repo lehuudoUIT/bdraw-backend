@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: DataTypes.STRING,
       scoreMilestone: DataTypes.INTEGER,
+      url: DataTypes.STRING,
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: () =>
