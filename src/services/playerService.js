@@ -135,6 +135,24 @@ const playerHistory = (id) => {
   });
 };
 
+let calculateLevel = (exp) => {
+  // Calculate level
+  let level = Math.floor(Math.sqrt(exp / 100));
+  // Calculate range
+
+  let maxExpOfLevel = 100 * ((level + 1) * (level + 1) - level * level);
+
+  // Calculate current exp of level
+
+  let currentExp = exp - 100 * level * level;
+
+  return {
+    level,
+    maxExpOfLevel,
+    currentExp,
+  };
+};
+
 const playerDetail = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -150,7 +168,6 @@ const playerDetail = (id) => {
               rankId: player.rankId,
             },
           }).then((rank) => {
-            console.log(rank);
             return rank.url;
           });
 
@@ -159,6 +176,11 @@ const playerDetail = (id) => {
           delete player.rankId;
 
           player.rankUrl = url;
+          //? Calculate level of player
+
+          let level = calculateLevel(player.exp);
+
+          player.exp = level;
 
           return player;
         })
@@ -377,6 +399,32 @@ const matchDetail = (matchId) => {
   });
 };
 
+const checkUpRank = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let matchResult = await db.Join.findAll({
+        where: {
+          matchId: matchId,
+        },
+        order: [["top", "ASC"]],
+      });
+
+      return resolve({
+        errCode: 0,
+        message: `Get match ${matchId} result successfully !`,
+        matchResult: matchResult,
+      });
+    } catch {
+      console.log(error);
+      return resolve({
+        errCode: 2,
+        message: `Save player result unsuccessfully !`,
+        error: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -387,4 +435,5 @@ module.exports = {
   playerUseItem,
   playerBuyItem,
   matchDetail,
+  checkUpRank,
 };

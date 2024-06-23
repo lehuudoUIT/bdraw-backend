@@ -9,6 +9,7 @@ import {
   postPlayerUseItem,
   postPlayerBuyItem,
   getMatchDetail,
+  getCheckUpRank,
 } from "../controllers/playerController";
 import {
   getDetailItem,
@@ -30,6 +31,7 @@ let initApiRoutes = (app) => {
   router.post("/player/buy-item", postPlayerBuyItem);
   router.post("/player/save-result", postPlayerSaveResult);
   router.get("/match/detail/:id", getMatchDetail);
+  router.get("/check/up-rank/:id", getCheckUpRank);
 
   //! ITEM
   router.get("/item/get-all/:id", getAllItems);
