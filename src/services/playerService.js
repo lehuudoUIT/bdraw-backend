@@ -399,26 +399,77 @@ const matchDetail = (matchId) => {
   });
 };
 
+let checkRank = (score) => {
+  if (score < 500) return 0;
+  if (score >= 500 && score < 1000) return 1;
+  if (score >= 1000 && score < 2000) return 2;
+  if (score >= 2000 && score < 4000) return 3;
+  if (score >= 4000 && score < 8000) return 4;
+  if (score >= 8000 && score < 15000) return 5;
+  if (score >= 15000 && score < 30000) return 6;
+  if (score >= 30000 && score < 40000) return 7;
+  if (score >= 40000 && score < 100000) return 8;
+  if (score >= 100000) return 9;
+};
+
 const checkUpRank = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let matchResult = await db.Join.findAll({
+      let latestMatchScore = await db.Join.findOne({
         where: {
-          matchId: matchId,
+          playerId: id,
         },
-        order: [["top", "ASC"]],
+        order: [["createdAt", "DESC"]],
+      }).then((match) => match.gainedScore);
+
+      let currentScore = await db.Player.findOne({
+        where: {
+          playerId: id,
+        },
+      }).then((player) => player.score);
+
+      let checkBeforeScore = checkRank(currentScore - latestMatchScore);
+      let checkCurrentScore = checkRank(currentScore);
+
+      let newRank = await db.Rank.findOne({
+        where: {
+          rankId: checkCurrentScore,
+        },
       });
 
-      return resolve({
-        errCode: 0,
-        message: `Get match ${matchId} result successfully !`,
-        matchResult: matchResult,
-      });
-    } catch {
+      if (checkBeforeScore < checkCurrentScore) {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "up",
+            newRank: newRank,
+          },
+        });
+      } else if (checkBeforeScore > checkCurrentScore) {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "down",
+            newRank: newRank,
+          },
+        });
+      } else {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "stable",
+            newRank: newRank,
+          },
+        });
+      }
+    } catch (error) {
       console.log(error);
       return resolve({
         errCode: 2,
-        message: `Save player result unsuccessfully !`,
+        message: `Check rank player unsuccessfully !`,
         error: error,
       });
     }
