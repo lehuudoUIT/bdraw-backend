@@ -223,7 +223,7 @@ const initSocket = (server) => {
                 const requestOptions = calculateRankings(requiredRoom.sockets);
                 console.log("🚀 ~ handleSetScore ~ requestOptions:", requestOptions)
                 // const response = await fetch("http://188.166.185.29:3107/api/v1/player/save-result");
-                fetch('http://localhost:3107/api/v1/player/save-result', {
+                fetch('http://188.166.185.29/api/v1/player/save-result', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
