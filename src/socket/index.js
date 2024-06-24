@@ -24,7 +24,7 @@ const initSocket = (server) => {
         mode: "development",
     });
 
-    const handleJoinRoom = (socket, room, password) => {
+    const handleJoinRoom = (socket, room, password, player) => {
 
         const requiredRoom = rooms.find(lroom => lroom.id === room);
         console.log("🚀 ~ handleJoinRoom ~ requiredRoom:", requiredRoom)
@@ -34,6 +34,11 @@ const initSocket = (server) => {
             if (requiredRoom.password === password && requiredRoom.sockets.length < 4) {
                 const newSocket = {
                     id: socket.id,
+                    playerId: player.playerId,
+                    name: player.name,
+                    rank: player.rank,
+                    level: player.level,
+                    currentAvatar: player.currentAvatar,
                     isReady: false,
                     score: 0,
                     isAFK: false
@@ -51,12 +56,17 @@ const initSocket = (server) => {
         }
     };
 
-    const handleCreateRoom = (socket, room, password) => {
+    const handleCreateRoom = (socket, room, password, player) => {
         const roomData = {
             id: room,
             sockets: [
                 {
                     id: socket.id,
+                    playerId: player.playerId,
+                    name: player.name,
+                    rank: player.rank,
+                    level: player.level,
+                    currentAvatar: player.currentAvatar,
                     isReady: false,
                     score: 0,
                     isAFK: false
@@ -91,6 +101,7 @@ const initSocket = (server) => {
         console.log("🚀 ~ handleLeaveRoom ~ requiredRoom:", requiredRoom)
 
         //findIndex of player who leave room and delete it
+
         const index = requiredRoom.sockets.findIndex(lsocket => lsocket.id === socket.id);
         if (index !== -1) {
             requiredRoom.sockets.splice(index, 1);
@@ -173,6 +184,9 @@ const initSocket = (server) => {
     const handleSetScore = async (socket, room, score, round) => {
         console.log("🚀 ~ handleSetScore ~ room:", room)
         const requiredRoom = rooms.find(lroom => lroom.id === room);
+
+        if (!requiredRoom)
+            return;
 
         const index = requiredRoom.sockets.findIndex(lsocket => lsocket.id === socket.id);
         if (index !== -1) {
@@ -312,18 +326,50 @@ const initSocket = (server) => {
         }
     };
 
+    const handleDisconnecting = (socket) => {
+        const userRooms = [...socket.rooms]; // Lấy tất cả các phòng mà người dùng đang tham gia
+        userRooms.forEach(roomId => {
+            // Bỏ qua phòng mặc định là socket id
+            if (roomId !== socket.id) {
+                const requiredRoom = rooms.find(room => room.id === roomId);
+                if (requiredRoom && !requiredRoom.gameState) {
+                    const playerIndex = requiredRoom.sockets.findIndex(player => player.id === socket.id);
+                    if (playerIndex !== -1) {
+                        requiredRoom.sockets.splice(playerIndex, 1); // Xóa người chơi khỏi phòng
+                    }
+
+                    // Nếu phòng không còn người chơi nào, xóa phòng
+                    if (requiredRoom.sockets.length === 0) {
+                        const roomIndex = rooms.findIndex(room => room.id === roomId);
+                        if (roomIndex !== -1) {
+                            rooms.splice(roomIndex, 1);
+                        }
+                    } else {
+                        // Cập nhật lại thông tin phòng
+                        io.to(requiredRoom.id).emit('foundRoom', requiredRoom);
+                    }
+
+                    console.log(`Player ${socket.id} disconnected and removed from room ${roomId}`);
+                }
+                if (requiredRoom && requiredRoom.gameState) {
+                    handleQuitGame(socket, roomId);
+                }
+            }
+        });
+    };
+
     io.on('connection', (socket) => {
         console.log(`🌞: ${socket.id} user just connected!`);
 
         socket.on('roomAction', (data) => {
-            const { action, room, password } = data;
+            const { action, room, password, player } = data;
 
             if (action === 'join') {
                 // Logic for joining room
-                handleJoinRoom(socket, room, password);
+                handleJoinRoom(socket, room, password, player);
             } else if (action === 'create') {
                 // Logic for creating room
-                handleCreateRoom(socket, room, password);
+                handleCreateRoom(socket, room, password, player);
             }
         });
 
@@ -362,16 +408,8 @@ const initSocket = (server) => {
             console.log(`🔥: ${socket.id} disconnected`);
         });
 
-        // socket.on('disconnecting', () => {
-        //     let rooms = socket.rooms;
-        //     console.log("🚀 ~ socket.on ~ rooms:", rooms)
-        //     socket.rooms.forEach(room => {
-        //         if (room !== socket.id) {
-        //             socket.leave(room);
-        //         }
-        //     });
-        //     console.log("🚀 ~ socket.on ~ rooms:", rooms)
-        // })
+        socket.on('disconnecting', () => handleDisconnecting(socket));
+
     });
 
     return io;
