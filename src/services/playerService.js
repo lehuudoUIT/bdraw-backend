@@ -319,13 +319,23 @@ const playerUseItem = (playerId, itemId) => {
 const playerBuyItem = (playerId, itemId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let playerBcoin = await db
-        .findOne({
-          where: {
-            playerId: playerId,
-          },
-        })
-        .then((player) => player.bcoin);
+      let playerBcoin = await db.Player.findOne({
+        where: {
+          playerId: playerId,
+        },
+      }).then((player) => player.bcoin);
+
+      let itemPrice = await db.Avatar.findOne({
+        where: {
+          avatarId: itemId,
+        },
+      }).then((item) => item.price);
+
+      if (playerBcoin < itemPrice)
+        return resolve({
+          errCode: 2,
+          message: `Player doesn't have enough money!`,
+        });
 
       await db.Player_Avatar.create({
         playerId,
@@ -344,6 +354,7 @@ const playerBuyItem = (playerId, itemId) => {
         message: `Player ${playerId} buys avatar ${itemId} successfully!`,
       });
     } catch (error) {
+      console.log(error);
       return resolve({
         errCode: 3,
         message: `Player ${playerId} buys avatar ${itemId} unsuccessfully!`,
