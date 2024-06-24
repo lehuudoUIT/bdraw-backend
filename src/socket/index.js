@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const { instrument } = require("@socket.io/admin-ui");
 const data = require("../data/label.json");
+const { default: calculateRankings } = require("../utils/calcRanking");
 
 const rooms = [];
 const countdownTimers = [];
@@ -219,9 +220,20 @@ const initSocket = (server) => {
                 const indexOfRoom = rooms.indexOf(requiredRoom);
 
                 // Call API
-                const response = await fetch("http://188.166.185.29:3107/api/v1/log-test");
-                const movies = await response.json();
-                console.log(movies);
+                const requestOptions = calculateRankings(requiredRoom.sockets);
+                console.log("🚀 ~ handleSetScore ~ requestOptions:", requestOptions)
+                // const response = await fetch("http://188.166.185.29:3107/api/v1/player/save-result");
+                fetch('http://localhost:3107/api/v1/player/save-result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: requestOptions,
+                    redirect: "follow"
+                })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch(error => console.error(error));
 
                 if (indexOfRoom !== -1) {
                     requiredRoom.sockets.forEach(socket => {
@@ -332,7 +344,7 @@ const initSocket = (server) => {
         }
     };
 
-    const handleQuitGame = (socket, roomId) => {
+    const handleQuitGame = async (socket, roomId) => {
         const requiredRoom = rooms.find(lroom => lroom.id === roomId);
         if (requiredRoom) {
             const player = requiredRoom.sockets.find(p => p.id === socket.id);
@@ -348,6 +360,21 @@ const initSocket = (server) => {
 
             if (allLeave) {
                 // Call API
+                const requestOptions = calculateRankings(requiredRoom.sockets);
+                console.log("🚀 ~ handleSetScore ~ requestOptions:", requestOptions)
+                const raw = JSON.stringify(requestOptions)
+                // const response = await fetch("http://188.166.185.29:3107/api/v1/player/save-result");
+                fetch('http://188.166.185.29/api/v1/player/save-result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: raw,
+                    redirect: "follow"
+                })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch(error => console.error(error));
 
                 //Delete room
                 const indexRoom = rooms.findIndex(room => room.id === requiredRoom.id);
