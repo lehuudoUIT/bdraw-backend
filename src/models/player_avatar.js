@@ -1,6 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
-import moment from "moment-timezone";
+const moment = require("moment-timezone");
 
 module.exports = (sequelize, DataTypes) => {
   class Player_Avatar extends Model {
