@@ -40,6 +40,20 @@ let handleUserLogin = (username, password) => {
           delete user.password;
 
           if (checkPassword) {
+            //? Get url of rank by rankId
+            let rankInfo = await db.Rank.findOne({
+              where: {
+                rankId: user.rankId,
+              },
+              attributes: { exclude: ["createdAt", "updatedAt"] },
+            });
+
+            console.log(rankInfo);
+
+            delete user.rankId;
+
+            user.rank = rankInfo;
+
             return resolve({
               errCode: 0,
               message: "Login successfully!",
@@ -70,13 +84,21 @@ const handlePlayerRegister = (name, username, password, gmail) => {
     try {
       let hashPassword = bcrypt.hashSync(password, salt);
 
+      let defaultAvatarUrl = await db.Avatar.findOne({
+        where: {
+          type: "Default",
+        },
+      })
+        .then((ava) => ava.url)
+        .catch((err) => console.log(err));
+
       let player = await db.Player.create({
         name: name,
         username: username,
         password: hashPassword,
         bcoin: 1000,
         rankId: 0,
-        currentAvatar: "",
+        currentAvatar: defaultAvatarUrl,
         exp: 0,
         score: 0,
         gmail: gmail,
