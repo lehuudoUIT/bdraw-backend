@@ -40,6 +40,20 @@ let handleUserLogin = (username, password) => {
           delete user.password;
 
           if (checkPassword) {
+            //? Get url of rank by rankId
+            let rankInfo = await db.Rank.findOne({
+              where: {
+                rankId: user.rankId,
+              },
+              attributes: { exclude: ["createdAt", "updatedAt"] },
+            });
+
+            console.log(rankInfo);
+
+            delete user.rankId;
+
+            user.rank = rankInfo;
+
             return resolve({
               errCode: 0,
               message: "Login successfully!",
@@ -70,13 +84,21 @@ const handlePlayerRegister = (name, username, password, gmail) => {
     try {
       let hashPassword = bcrypt.hashSync(password, salt);
 
+      let defaultAvatarUrl = await db.Avatar.findOne({
+        where: {
+          type: "Default",
+        },
+      })
+        .then((ava) => ava.url)
+        .catch((err) => console.log(err));
+
       let player = await db.Player.create({
         name: name,
         username: username,
         password: hashPassword,
-        bcoin: 0,
+        bcoin: 1000,
         rankId: 0,
-        currentAvatar: "",
+        currentAvatar: defaultAvatarUrl,
         exp: 0,
         score: 0,
         gmail: gmail,
@@ -135,6 +157,24 @@ const playerHistory = (id) => {
   });
 };
 
+let calculateLevel = (exp) => {
+  // Calculate level
+  let level = Math.floor(Math.sqrt(exp / 100));
+  // Calculate range
+
+  let maxExpOfLevel = 100 * ((level + 1) * (level + 1) - level * level);
+
+  // Calculate current exp of level
+
+  let currentExp = exp - 100 * level * level;
+
+  return {
+    level,
+    maxExpOfLevel,
+    currentExp,
+  };
+};
+
 const playerDetail = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -142,9 +182,33 @@ const playerDetail = (id) => {
         where: {
           playerId: id,
         },
-      }).catch((err) => {
-        console.log(err);
-      });
+      })
+        .then(async (player) => {
+          //? Get url of rank by rankId
+          let url = await db.Rank.findOne({
+            where: {
+              rankId: player.rankId,
+            },
+          }).then((rank) => {
+            return rank.url;
+          });
+
+          //? Delete field rankId and add rankUrl
+
+          delete player.rankId;
+
+          player.rankUrl = url;
+          //? Calculate level of player
+
+          let level = calculateLevel(player.exp);
+
+          player.exp = level;
+
+          return player;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
       return resolve({
         errCode: 0,
@@ -357,6 +421,83 @@ const matchDetail = (matchId) => {
   });
 };
 
+let checkRank = (score) => {
+  if (score < 500) return 0;
+  if (score >= 500 && score < 1000) return 1;
+  if (score >= 1000 && score < 2000) return 2;
+  if (score >= 2000 && score < 4000) return 3;
+  if (score >= 4000 && score < 8000) return 4;
+  if (score >= 8000 && score < 15000) return 5;
+  if (score >= 15000 && score < 30000) return 6;
+  if (score >= 30000 && score < 40000) return 7;
+  if (score >= 40000 && score < 100000) return 8;
+  if (score >= 100000) return 9;
+};
+
+const checkUpRank = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let latestMatchScore = await db.Join.findOne({
+        where: {
+          playerId: id,
+        },
+        order: [["createdAt", "DESC"]],
+      }).then((match) => match.gainedScore);
+
+      let currentScore = await db.Player.findOne({
+        where: {
+          playerId: id,
+        },
+      }).then((player) => player.score);
+
+      let checkBeforeScore = checkRank(currentScore - latestMatchScore);
+      let checkCurrentScore = checkRank(currentScore);
+
+      let newRank = await db.Rank.findOne({
+        where: {
+          rankId: checkCurrentScore,
+        },
+      });
+
+      if (checkBeforeScore < checkCurrentScore) {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "up",
+            newRank: newRank,
+          },
+        });
+      } else if (checkBeforeScore > checkCurrentScore) {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "down",
+            newRank: newRank,
+          },
+        });
+      } else {
+        return resolve({
+          errCode: 0,
+          message: `Check rank successfully !`,
+          checkRank: {
+            status: "stable",
+            newRank: newRank,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return resolve({
+        errCode: 2,
+        message: `Check rank player unsuccessfully !`,
+        error: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -367,4 +508,5 @@ module.exports = {
   playerUseItem,
   playerBuyItem,
   matchDetail,
+  checkUpRank,
 };

@@ -223,8 +223,8 @@ const initSocket = (server) => {
         }
     }
 
-    const handleFindMatch = (socket) => {
-        queue.push(socket);
+    const handleFindMatch = (socket, player) => {
+        queue.push({ socket, player });
         console.log(`${socket.id} join the queue`);
 
         if (queue.length >= 2) {
@@ -233,18 +233,38 @@ const initSocket = (server) => {
             const player2 = queue.shift();
 
             const room = {
-                id: `${player1.id}-${player2.id}`,
+                id: `${player1.socket.id}-${player2.socket.id}`,
                 sockets: [
-                    { id: player1.id, isReady: false, score: 0, isAFK: false },
-                    { id: player2.id, isReady: false, score: 0, isAFK: false }
+                    {
+                        id: player1.socket.id,
+                        playerId: player1.player.playerId,
+                        name: player1.player.name,
+                        rank: player1.player.rank,
+                        level: player1.player.level,
+                        currentAvatar: player1.player.currentAvatar,
+                        isReady: false,
+                        score: 0,
+                        isAFK: false
+                    },
+                    {
+                        id: player2.socket.id,
+                        playerId: player2.player.playerId,
+                        name: player2.player.name,
+                        rank: player2.player.rank,
+                        level: player2.player.level,
+                        currentAvatar: player2.player.currentAvatar,
+                        isReady: false,
+                        score: 0,
+                        isAFK: false
+                    }
                 ],
                 gameState: false,
                 rounds: new Array(6).fill(false),
                 drawFinish: new Array(6).fill(0)
             };
 
-            player1.join(room.id);
-            player2.join(room.id)
+            player1.socket.join(room.id);
+            player2.socket.join(room.id)
             rooms.push(room);
 
             // Notify both players of the match
@@ -392,7 +412,7 @@ const initSocket = (server) => {
 
         socket.on('set-score', (data) => handleSetScore(socket, data.room, data.score, data.round));
 
-        socket.on('findMatch', () => handleFindMatch(socket));
+        socket.on('findMatch', (data) => handleFindMatch(socket, data));
 
         socket.on('cancelFindMatch', () => handleCancelFindMatch(socket));
 
