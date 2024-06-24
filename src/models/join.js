@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       gainedExp: DataTypes.INTEGER,
       gainedScore: DataTypes.INTEGER,
       top: DataTypes.INTEGER,
+      isAFK: DataTypes.BOOLEAN,
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: () =>
