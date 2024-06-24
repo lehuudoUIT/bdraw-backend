@@ -185,19 +185,19 @@ const playerDetail = (id) => {
       })
         .then(async (player) => {
           //? Get url of rank by rankId
-          let url = await db.Rank.findOne({
+          let rankInfo = await db.Rank.findOne({
             where: {
               rankId: player.rankId,
             },
-          }).then((rank) => {
-            return rank.url;
+            attributes: { exclude: ["createdAt", "updatedAt"] },
           });
 
-          //? Delete field rankId and add rankUrl
+          console.log(rankInfo);
 
           delete player.rankId;
 
-          player.rankUrl = url;
+          player.rank = rankInfo;
+
           //? Calculate level of player
 
           let level = calculateLevel(player.exp);

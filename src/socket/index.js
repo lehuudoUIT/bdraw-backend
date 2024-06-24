@@ -100,6 +100,9 @@ const initSocket = (server) => {
         const requiredRoom = rooms.find(lroom => lroom.id === room);
         console.log("🚀 ~ handleLeaveRoom ~ requiredRoom:", requiredRoom)
 
+        if (!requiredRoom)
+            return;
+
         //findIndex of player who leave room and delete it
 
         const index = requiredRoom.sockets.findIndex(lsocket => lsocket.id === socket.id);
@@ -123,6 +126,9 @@ const initSocket = (server) => {
     const handleChangeIsReady = (socket, room) => {
         const requiredRoom = rooms.find(lroom => lroom.id === room);
 
+        if (!requiredRoom)
+            return;
+
         const index = requiredRoom.sockets.findIndex(lsocket => lsocket.id === socket.id);
         if (index !== -1) {
             requiredRoom.sockets[index].isReady = !requiredRoom.sockets[index].isReady
@@ -145,6 +151,9 @@ const initSocket = (server) => {
         console.log("🚀 ~ handldeStartGame ~ room:", room)
         const requiredRoom = rooms.find(lroom => lroom.id === room);
 
+        if (!requiredRoom)
+            return;
+
         if (requiredRoom.gameState === true)
             return;
 
@@ -166,6 +175,9 @@ const initSocket = (server) => {
 
         console.log("🚀 ~ handldeStartRoom ~ room:", room)
         const requiredRoom = rooms.find(lroom => lroom.id === room);
+
+        if (!requiredRoom)
+            return;
 
         if (requiredRoom?.rounds[round] === true)
             return;
@@ -274,7 +286,7 @@ const initSocket = (server) => {
     };
 
     const handleCancelFindMatch = (socket) => {
-        const index = queue.indexOf(socket);
+        const index = queue.findIndex(player => player.socket === socket);
 
         if (index !== -1) {
             queue.splice(index, 1);
