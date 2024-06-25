@@ -323,7 +323,10 @@ const playerBuyItem = (playerId, itemId) => {
         where: {
           playerId: playerId,
         },
-      }).then((player) => player.bcoin);
+        raw: true,
+      })
+        .then((player) => player.bcoin)
+        .catch((err) => console.log(err));
 
       let itemPrice = await db.Avatar.findOne({
         where: {
@@ -331,11 +334,26 @@ const playerBuyItem = (playerId, itemId) => {
         },
       }).then((item) => item.price);
 
+      //? Check if player has enough money
       if (playerBcoin < itemPrice)
         return resolve({
           errCode: 2,
           message: `Player doesn't have enough money!`,
         });
+
+      //? Subtract player money
+      await db.Player.decrement(
+        {
+          bcoin: itemPrice,
+        },
+        {
+          where: {
+            playerId: playerId,
+          },
+        }
+      );
+
+      //? Save transaction to database
 
       await db.Player_Avatar.create({
         playerId,
