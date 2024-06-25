@@ -10,6 +10,7 @@ import {
   matchDetail,
   checkUpRank,
   playerDetailByUsername,
+  sendOTP,
 } from "../services/playerService";
 
 let handleLogin = async (req, res) => {
@@ -145,6 +146,18 @@ const getCheckUpRank = async (req, res) => {
   return res.status(200).json(response);
 };
 
+const handleSendOtp = async (req, res) => {
+  const { otp, email } = req.body;
+  if (!otp || !email) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing input parameter !",
+    });
+  }
+  let response = await sendOTP(otp, email);
+  return res.status(200).json(response);
+};
+
 module.exports = {
   handleLogin,
   handleRegister,
@@ -157,4 +170,5 @@ module.exports = {
   getMatchDetail,
   getCheckUpRank,
   getPlayerDetailByUsername,
+  handleSendOtp,
 };

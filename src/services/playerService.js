@@ -1,6 +1,8 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
+require("dotenv").config();
+const nodemailer = require("nodemailer");
 
 let salt = bcrypt.genSaltSync(10);
 
@@ -578,6 +580,51 @@ const checkUpRank = (id) => {
   });
 };
 
+const sendOTP = async (otp, email) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, // Use `true` for port 465, `false` for all other ports
+        auth: {
+          user: process.env.EMAIL_APP,
+          pass: process.env.EMAIL_APP_PASWORD,
+        },
+      });
+
+      const info = await transporter
+        .sendMail({
+          from: '"BDraw Admin👻" <lehuudouit@gmail.com>', // sender address
+          to: email, // list of receivers
+          subject: "OTP verification", // Subject line
+          text: "Your OTP is...", // plain text body
+          html: `Your OTP is <b>${otp}</b>`, // html body
+        })
+        .then((info) => {
+          resolve({
+            errMessage: 0,
+            message: "Send OTP sucessfully!",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          resolve({
+            errMessage: 1,
+            message: "Send OTP failed!",
+            err: err,
+          });
+        });
+    } catch (error) {
+      reject({
+        errMessage: 1,
+        message: "Send OTP failed!",
+        err: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -590,4 +637,5 @@ module.exports = {
   matchDetail,
   checkUpRank,
   playerDetailByUsername,
+  sendOTP,
 };

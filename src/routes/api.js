@@ -11,6 +11,7 @@ import {
   getMatchDetail,
   getCheckUpRank,
   getPlayerDetailByUsername,
+  handleSendOtp,
 } from "../controllers/playerController";
 import {
   getDetailItem,
@@ -38,6 +39,7 @@ let initApiRoutes = (app) => {
   //! ITEM
   router.get("/item/get-all/:id", getAllItems);
   router.get("/item/detail/:id", getDetailItem);
+  router.post("/system/otp/send", handleSendOtp);
 
   //! DEBUG
   router.get("/log-all", logAllDb);
