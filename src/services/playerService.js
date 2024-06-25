@@ -224,6 +224,57 @@ const playerDetail = (id) => {
     }
   });
 };
+
+const playerDetailByUsername = (username) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let player = await db.Player.findOne({
+        where: {
+          username: username,
+        },
+      })
+        .then(async (player) => {
+          //? Get url of rank by rankId
+          let rankInfo = await db.Rank.findOne({
+            where: {
+              rankId: player.rankId,
+            },
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          });
+
+          console.log(rankInfo);
+
+          delete player.rankId;
+
+          player.rank = rankInfo;
+
+          //? Calculate level of player
+
+          let level = calculateLevel(player.exp);
+
+          player.exp = level;
+
+          return player;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      return resolve({
+        errCode: 0,
+        message: `Get player ${username} detail successfully!`,
+        player,
+      });
+    } catch (error) {
+      reject({
+        errCode: 3,
+        message: `Get player ${username} detail unsuccessfully!`,
+        error: error,
+      });
+    }
+  });
+};
+
 const playerInventory = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -538,4 +589,5 @@ module.exports = {
   playerBuyItem,
   matchDetail,
   checkUpRank,
+  playerDetailByUsername,
 };

@@ -9,6 +9,7 @@ import {
   playerBuyItem,
   matchDetail,
   checkUpRank,
+  playerDetailByUsername,
 } from "../services/playerService";
 
 let handleLogin = async (req, res) => {
@@ -59,6 +60,20 @@ const getPlayerDetail = async (req, res) => {
   let response = await playerDetail(id);
   return res.status(200).json(response);
 };
+
+const getPlayerDetailByUsername = async (req, res) => {
+  const { username } = req.params;
+
+  if (!username) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing input parameter !",
+    });
+  }
+  let response = await playerDetailByUsername(username);
+  return res.status(200).json(response);
+};
+
 const getPlayerInventory = async (req, res) => {
   const { id } = req.params;
 
@@ -141,4 +156,5 @@ module.exports = {
   postPlayerBuyItem,
   getMatchDetail,
   getCheckUpRank,
+  getPlayerDetailByUsername,
 };
