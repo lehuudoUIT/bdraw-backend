@@ -516,6 +516,31 @@ let checkRank = (score) => {
   if (score >= 100000) return 9;
 };
 
+let getRankColor = (rankId) => {
+  switch (rankId) {
+    case 1:
+      return "#4A4948";
+    case 2:
+      return "#B87B57";
+    case 3:
+      return "#9A9993";
+    case 4:
+      return "#DDAC42";
+    case 5:
+      return "#50A9C7";
+    case 6:
+      return "#127694";
+    case 7:
+      return "#B93DFD";
+    case 8:
+      return "#8E1415";
+    case 9:
+      return "#5CACE8";
+    default:
+      return "#DAD4CA";
+  }
+};
+
 const checkUpRank = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -524,7 +549,10 @@ const checkUpRank = (id) => {
           playerId: id,
         },
         order: [["createdAt", "DESC"]],
-      }).then((match) => match.gainedScore);
+      }).then((match) => {
+        if (!match) return 0;
+        return match.gainedScore;
+      });
 
       let currentScore = await db.Player.findOne({
         where: {
@@ -540,6 +568,10 @@ const checkUpRank = (id) => {
           rankId: checkCurrentScore,
         },
       });
+
+      let color = getRankColor(checkCurrentScore);
+
+      newRank.color = color;
 
       if (checkBeforeScore < checkCurrentScore) {
         return resolve({

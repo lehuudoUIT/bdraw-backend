@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       matchId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       gainedBcoin: {
         type: Sequelize.INTEGER,
