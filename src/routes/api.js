@@ -10,6 +10,8 @@ import {
   postPlayerBuyItem,
   getMatchDetail,
   getCheckUpRank,
+  getPlayerDetailByUsername,
+  handleSendOtp,
 } from "../controllers/playerController";
 import {
   getDetailItem,
@@ -26,6 +28,7 @@ let initApiRoutes = (app) => {
   //! PLAYER
   router.get("/player/history/:id", getPlayerHistory);
   router.get("/player/detail/:id", getPlayerDetail);
+  router.get("/player/info/:username", getPlayerDetailByUsername);
   router.get("/player/inventory/:id", getPlayerInventory);
   router.post("/player/use-item", postPlayerUseItem);
   router.post("/player/buy-item", postPlayerBuyItem);
@@ -36,6 +39,7 @@ let initApiRoutes = (app) => {
   //! ITEM
   router.get("/item/get-all/:id", getAllItems);
   router.get("/item/detail/:id", getDetailItem);
+  router.post("/system/otp/send", handleSendOtp);
 
   //! DEBUG
   router.get("/log-all", logAllDb);
