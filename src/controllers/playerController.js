@@ -91,7 +91,7 @@ const getPlayerInventory = async (req, res) => {
 const postPlayerUseItem = async (req, res) => {
   const { playerId, itemId } = req.body;
 
-  if (!playerId || !itemId) {
+  if (!playerId) {
     return res.status(500).json({
       errCode: 1,
       message: "Missing input parameter !",
