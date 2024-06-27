@@ -657,6 +657,42 @@ const sendOTP = async (otp, email) => {
   });
 };
 
+const forgetPassword = async (playerId, newPassword) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let newHashPassword = bcrypt.hashSync(newPassword, salt);
+
+      await db.Player.update(
+        {
+          password: newHashPassword,
+        },
+        {
+          where: {
+            playerId: playerId,
+          },
+        }
+      ).catch((err) => {
+        console.log(err);
+        return resolve({
+          errMessage: 3,
+          message: "Change password unsucessfully!",
+        });
+      });
+      resolve({
+        errMessage: 0,
+        message: "Change password sucessfully!",
+      });
+    } catch (error) {
+      console.log(error);
+      reject({
+        errMessage: 2,
+        message: "Change password failed!",
+        err: error,
+      });
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   handlePlayerRegister,
@@ -670,4 +706,5 @@ module.exports = {
   checkUpRank,
   playerDetailByUsername,
   sendOTP,
+  forgetPassword,
 };

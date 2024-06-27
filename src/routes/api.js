@@ -12,6 +12,7 @@ import {
   getCheckUpRank,
   getPlayerDetailByUsername,
   handleSendOtp,
+  postForgetPassword,
 } from "../controllers/playerController";
 import {
   getDetailItem,
@@ -35,6 +36,7 @@ let initApiRoutes = (app) => {
   router.post("/player/save-result", postPlayerSaveResult);
   router.get("/match/detail/:id", getMatchDetail);
   router.get("/check/up-rank/:id", getCheckUpRank);
+  router.post("/password/forget", postForgetPassword);
 
   //! ITEM
   router.get("/item/get-all/:id", getAllItems);

@@ -11,6 +11,7 @@ import {
   checkUpRank,
   playerDetailByUsername,
   sendOTP,
+  forgetPassword,
 } from "../services/playerService";
 
 let handleLogin = async (req, res) => {
@@ -158,6 +159,18 @@ const handleSendOtp = async (req, res) => {
   return res.status(200).json(response);
 };
 
+const postForgetPassword = async (req, res) => {
+  const { playerId, newPassword } = req.body;
+  if (!playerId || !newPassword) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing input parameter !",
+    });
+  }
+  let response = await forgetPassword(playerId, newPassword);
+  return res.status(200).json(response);
+};
+
 module.exports = {
   handleLogin,
   handleRegister,
@@ -171,4 +184,5 @@ module.exports = {
   getCheckUpRank,
   getPlayerDetailByUsername,
   handleSendOtp,
+  postForgetPassword,
 };
