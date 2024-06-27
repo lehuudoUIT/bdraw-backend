@@ -10,6 +10,7 @@ const queue = [];
 const initSocket = (server) => {
 
     const io = new Server(server, {
+        // maxHttpBufferSize: 1e20,
         cors: {
             origin: [
                 "https://admin.socket.io",
@@ -31,6 +32,11 @@ const initSocket = (server) => {
         console.log("🚀 ~ handleJoinRoom ~ requiredRoom:", requiredRoom)
 
         if (requiredRoom) {
+            if (requiredRoom.gameState === true) {
+                socket.emit('invalidOperation', 'Invalid operation: the game has been started');
+                return;
+            }
+
             // Room exists, check for password and room size
             if (requiredRoom.password === password && requiredRoom.sockets.length < 4) {
                 const newSocket = {
@@ -42,6 +48,8 @@ const initSocket = (server) => {
                     currentAvatar: player.currentAvatar,
                     isReady: false,
                     score: 0,
+                    encodeImages: [],
+                    isCorrect: false,
                     isAFK: false
                 }
                 requiredRoom.sockets.push(newSocket);
@@ -70,6 +78,8 @@ const initSocket = (server) => {
                     currentAvatar: player.currentAvatar,
                     isReady: false,
                     score: 0,
+                    encodeImages: [],
+                    isCorrect: false,
                     isAFK: false
                 }
             ],
@@ -137,6 +147,11 @@ const initSocket = (server) => {
 
         io.to(requiredRoom.id).emit('foundRoom', requiredRoom);
 
+        if (requiredRoom.sockets.length === 1 && requiredRoom.sockets[index].isReady === true) {
+            socket.emit('notice', 'Room required at least 2 players');
+            return;
+        }
+
         const allReady = requiredRoom.sockets.every(s => s.isReady);
         console.log("🚀 ~ handleChangeIsReady ~ allReady:", allReady)
 
@@ -194,7 +209,7 @@ const initSocket = (server) => {
         }, 27000);
     }
 
-    const handleSetScore = async (socket, room, score, round) => {
+    const handleSetScore = async (socket, room, score, round, encodeImage) => {
         console.log("🚀 ~ handleSetScore ~ room:", room)
         const requiredRoom = rooms.find(lroom => lroom.id === room);
 
@@ -203,7 +218,9 @@ const initSocket = (server) => {
 
         const index = requiredRoom.sockets.findIndex(lsocket => lsocket.id === socket.id);
         if (index !== -1) {
+            requiredRoom.sockets[index].isCorrect = requiredRoom.sockets[index].score < score;
             requiredRoom.sockets[index].score = score;
+            requiredRoom.sockets[index].encodeImages.push(encodeImage);
             requiredRoom.drawFinish[round]++;
         }
 
@@ -237,12 +254,14 @@ const initSocket = (server) => {
                     .catch(error => console.error(error));
 
                 if (indexOfRoom !== -1) {
-                    requiredRoom.sockets.forEach(socket => {
-                        io.sockets.sockets.get(socket.id)?.leave(requiredRoom.id);
-                    })
+                    setTimeout(() => {
+                        requiredRoom.sockets.forEach(socket => {
+                            io.sockets.sockets.get(socket.id)?.leave(requiredRoom.id);
+                        })
 
-                    console.log(`Delete room ${requiredRoom.id}`);
-                    rooms.splice(indexOfRoom, 1);
+                        console.log(`Delete room ${requiredRoom.id}`);
+                        rooms.splice(indexOfRoom, 1);
+                    }, 6000)
                 }
             }
         }
@@ -257,8 +276,10 @@ const initSocket = (server) => {
             const player1 = queue.shift();
             const player2 = queue.shift();
 
+            const initId = Math.floor(Math.random() * 1000000);
+
             const room = {
-                id: `${player1.socket.id}-${player2.socket.id}`,
+                id: `${player1.socket.id}-${initId}-${player2.socket.id}`,
                 sockets: [
                     {
                         id: player1.socket.id,
@@ -269,6 +290,8 @@ const initSocket = (server) => {
                         currentAvatar: player1.player.currentAvatar,
                         isReady: false,
                         score: 0,
+                        encodeImages: [],
+                        isCorrect: false,
                         isAFK: false
                     },
                     {
@@ -280,6 +303,8 @@ const initSocket = (server) => {
                         currentAvatar: player2.player.currentAvatar,
                         isReady: false,
                         score: 0,
+                        encodeImages: [],
+                        isCorrect: false,
                         isAFK: false
                     }
                 ],
@@ -450,7 +475,7 @@ const initSocket = (server) => {
 
         socket.on('startRound', (data) => handldeStartRound(data.room, data.round));
 
-        socket.on('set-score', (data) => handleSetScore(socket, data.room, data.score, data.round));
+        socket.on('set-score', (data) => handleSetScore(socket, data.room, data.score, data.round, data.encodeImage));
 
         socket.on('findMatch', (data) => handleFindMatch(socket, data));
 

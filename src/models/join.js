@@ -1,6 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
-import moment from "moment-timezone";
+const moment = require("moment-timezone");
 
 module.exports = (sequelize, DataTypes) => {
   class Join extends Model {
@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       gainedExp: DataTypes.INTEGER,
       gainedScore: DataTypes.INTEGER,
       top: DataTypes.INTEGER,
+      isAFK: DataTypes.BOOLEAN,
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: () =>
