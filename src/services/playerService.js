@@ -535,7 +535,7 @@ let getRankColor = (rankId) => {
     case 8:
       return "#8E1415";
     case 9:
-      return "#5CACE8";
+      return "#183867";
     default:
       return "#DAD4CA";
   }
