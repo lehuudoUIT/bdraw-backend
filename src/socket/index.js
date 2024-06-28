@@ -224,7 +224,9 @@ const initSocket = (server) => {
             requiredRoom.drawFinish[round]++;
         }
 
-        if (requiredRoom.drawFinish[round] === requiredRoom.sockets.length) {
+        const numPlayerOnl = requiredRoom.sockets.filter(socket => !socket.isAFK).length;
+
+        if (requiredRoom.drawFinish[round] === numPlayerOnl) {
             clearTimeout(countdownTimers[room]);
             io.to(room).emit('get-score', requiredRoom);
             setTimeout(() => {
